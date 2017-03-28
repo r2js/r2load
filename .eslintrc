@@ -1,0 +1,11 @@
+{
+    "extends": "airbnb",
+    "env": {
+        "node": true,
+        "mocha": true
+    },    
+    "rules": {
+        "no-param-reassign": 1,
+        "no-confusing-arrow": 0
+    }
+}
