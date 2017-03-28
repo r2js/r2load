@@ -3,9 +3,10 @@
     "env": {
         "node": true,
         "mocha": true
-    },    
+    },
     "rules": {
         "no-param-reassign": 1,
-        "no-confusing-arrow": 0
+        "no-confusing-arrow": 0,
+        "import/no-unresolved": 0
     }
 }
