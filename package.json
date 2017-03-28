@@ -24,7 +24,13 @@
   },
   "main": "index.js",
   "readmeFilename": "README.md",
-  "keywords": [],
+  "keywords": [
+    "autoload",
+    "autoloader",
+    "load",
+    "require",
+    "configuration"
+  ],
   "scripts": {
     "test": "mocha"
   },
