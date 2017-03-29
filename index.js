@@ -38,14 +38,18 @@ module.exports = (options = {}) => {
 
       if (object && fName) {
         push({ object, name: fName, opts: fOpts });
+      } else {
+        log('service not found!');
       }
 
       return this;
     },
 
-    into(obj = {}) {
+    into(...args) {
+      const [obj = {}] = args;
+      obj.services = {};
       const list = _.uniq(_.flatten(scripts), 'name');
-      const services = _.reduce(list, (memo, item) => {
+      _.reduce(list, (memo, item) => {
         const { object, name, opts } = item;
         let instance;
         if (object && typeof object === 'function') {
@@ -60,9 +64,8 @@ module.exports = (options = {}) => {
         log(`loaded, ${item.name}`);
         const extendObj = name ? getObj(name, instance) : {};
         return _.extend(memo, extendObj);
-      }, {});
+      }, obj.services);
 
-      Object.assign(obj, { services });
       return this;
     },
   };

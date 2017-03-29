@@ -1,7 +1,7 @@
 {
   "name": "r2load",
-  "description": "A Node.js autoloader for files, folders, and modules",
-  "version": "1.0.1",
+  "description": "Node.js autoloader for files, folders, and modules",
+  "version": "1.0.2",
   "author": "Selçuk Fatih Sevinç",
   "license": "MIT",
   "engines": {
