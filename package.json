@@ -25,6 +25,8 @@
   "main": "index.js",
   "readmeFilename": "README.md",
   "keywords": [
+    "r2js",
+    "r2load",
     "autoload",
     "autoloader",
     "load",
