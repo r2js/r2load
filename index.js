@@ -52,7 +52,9 @@ module.exports = (options = {}) => {
       _.reduce(list, (memo, item) => {
         const { object, name, opts } = item;
         let instance;
-        if (object && typeof object === 'function') {
+        if (object && typeof object === 'object') {
+          instance = object; // load directly
+        } else if (object && typeof object === 'function') {
           instance = object.call(object, obj, opts);
         } else {
           const fullPath = `${item.cwd}/${item.name}`;
