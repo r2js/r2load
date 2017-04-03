@@ -2,6 +2,7 @@ const glob = require('glob');
 const _ = require('underscore');
 const log = require('debug')('r2:load');
 
+const toString = Object.prototype.toString;
 module.exports = (options = {}) => {
   const { baseDir } = options;
   const scripts = [];
@@ -59,13 +60,12 @@ module.exports = (options = {}) => {
         } else {
           const fullPath = `${item.cwd}/${item.name}`;
           instance = require(fullPath); // eslint-disable-line
-          if (typeof instance.call === 'function') {
+          if (toString.call(instance) === '[object Function]') {
             instance = instance.call(instance, obj);
           }
         }
         log(`loaded, ${item.name}`);
-        const extendObj = name ? getObj(name, instance) : {};
-        return _.extend(memo, extendObj);
+        return _.extend(memo, getObj(name, instance));
       }, obj.services);
 
       return this;

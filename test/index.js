@@ -137,5 +137,14 @@ describe('r2load', () => {
       expect(app.services['ServiceB-Name'].objName).to.equal('service/b');
       expect(app.services['ServiceB-Name'].opts.param).to.equal('b');
     });
+
+    it('should load object', () => {
+      const app = {};
+      const loader = r2load({ baseDir: __dirname });
+      loader.serve({ a: 1, b: 2 }, 'CustomObject').into(app);
+      expect(app.services.CustomObject).to.not.equal(undefined);
+      expect(app.services.CustomObject.a).to.equal(1);
+      expect(app.services.CustomObject.b).to.equal(2);
+    });
   });
 });
