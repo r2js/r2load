@@ -3,11 +3,12 @@ const _ = require('underscore');
 const log = require('debug')('r2:load');
 
 const toString = Object.prototype.toString;
+
 module.exports = (options = {}) => {
   const { baseDir } = options;
   const scripts = [];
   const pattern = source => source.includes('.js') ? source : `${source}/**/*.js`;
-  const getList = cwd => list => _.map(list, name => ({ cwd, name }));
+  const getList = cwd => list => list.map(name => ({ cwd, name }));
   const app = getList(process.cwd());
   const base = getList(baseDir);
   const push = list => scripts.push(list);
@@ -28,17 +29,17 @@ module.exports = (options = {}) => {
 
     serve(...args) {
       const [object, name, opts] = args;
-      let fName = name;
-      let fOpts = opts;
+      let getName = name;
+      let getOpts = opts;
       if (name && !opts && _.isObject(name)) {
-        fName = name.name || object.name;
-        fOpts = name;
+        getName = name.name || object.name;
+        getOpts = name;
       } else if (!name && !opts && object) {
-        fName = object.name;
+        getName = object.name;
       }
 
-      if (object && fName) {
-        push({ object, name: fName, opts: fOpts });
+      if (object && getName) {
+        push({ object, name: getName, opts: getOpts });
       } else {
         log('service not found!');
       }
@@ -50,7 +51,7 @@ module.exports = (options = {}) => {
       const [obj = {}] = args;
       obj.services = {};
       const list = _.uniq(_.flatten(scripts), 'name');
-      _.reduce(list, (memo, item) => {
+      list.reduce((memo, item) => {
         const { object, name, opts } = item;
         let instance;
         if (object && typeof object === 'object') {
@@ -65,7 +66,7 @@ module.exports = (options = {}) => {
           }
         }
         log(`loaded, ${item.name}`);
-        return _.extend(memo, getObj(name, instance));
+        return Object.assign(memo, getObj(name, instance));
       }, obj.services);
 
       return this;
