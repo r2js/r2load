@@ -146,5 +146,14 @@ describe('r2load', () => {
       expect(app.services.CustomObject.a).to.equal(1);
       expect(app.services.CustomObject.b).to.equal(2);
     });
+
+    it('should get previous service in current service', () => {
+      const app = {};
+      const loader = r2load({ baseDir: __dirname });
+      const ServiceB = require('./service/b'); // eslint-disable-line
+      const ServiceC = require('./service/c'); // eslint-disable-line
+      loader.serve(ServiceB, 'ServiceB').serve(ServiceC, 'ServiceC').into(app);
+      expect(app.services.ServiceC.prevService.objName).to.equal('service/b');
+    });
   });
 });

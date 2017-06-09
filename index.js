@@ -47,6 +47,7 @@ module.exports = (options = {}) => {
 
     into(...args) {
       const [obj = {}] = args;
+      obj.services = {};
       const list = _.uniq(_.flatten(scripts), 'name');
       obj.services = list.reduce((memo, item) => {
         const { object, name, opts } = item;
@@ -64,7 +65,7 @@ module.exports = (options = {}) => {
         }
         log(`loaded, ${item.name}`);
         return Object.assign(memo, getObj(name, instance));
-      }, {});
+      }, obj.services);
 
       return this;
     },
