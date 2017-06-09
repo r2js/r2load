@@ -2,9 +2,8 @@ const glob = require('glob');
 const _ = require('underscore');
 const log = require('debug')('r2:load');
 
-const toString = Object.prototype.toString;
-
 module.exports = (options = {}) => {
+  const toString = Object.prototype.toString;
   const { baseDir } = options;
   const scripts = [];
   const pattern = source => source.includes('.js') ? source : `${source}/**/*.js`;
@@ -28,18 +27,17 @@ module.exports = (options = {}) => {
     },
 
     serve(...args) {
-      const [object, name, opts] = args;
-      let getName = name;
-      let getOpts = opts;
+      const [object, ...rest] = args;
+      let [name, opts] = rest;
       if (name && !opts && _.isObject(name)) {
-        getName = name.name || object.name;
-        getOpts = name;
+        opts = name;
+        name = name.name || object.name;
       } else if (!name && !opts && object) {
-        getName = object.name;
+        name = object.name;
       }
 
-      if (object && getName) {
-        push({ object, name: getName, opts: getOpts });
+      if (object && name) {
+        push({ object, name, opts });
       } else {
         log('service not found!');
       }
@@ -49,9 +47,8 @@ module.exports = (options = {}) => {
 
     into(...args) {
       const [obj = {}] = args;
-      obj.services = {};
       const list = _.uniq(_.flatten(scripts), 'name');
-      list.reduce((memo, item) => {
+      obj.services = list.reduce((memo, item) => {
         const { object, name, opts } = item;
         let instance;
         if (object && typeof object === 'object') {
@@ -67,7 +64,7 @@ module.exports = (options = {}) => {
         }
         log(`loaded, ${item.name}`);
         return Object.assign(memo, getObj(name, instance));
-      }, obj.services);
+      }, {});
 
       return this;
     },
