@@ -19,6 +19,17 @@ describe('r2load', () => {
         return file;
       });
     });
+
+    it('should not load local directory without baseDir param', () => {
+      const app = {};
+      const loader = r2load();
+      loader.local('model').into(app);
+      ['a', 'b', 'c'].map((file) => {
+        const model = `model/${file}`;
+        expect(app.services[model]).to.equal(undefined);
+        return file;
+      });
+    });
   });
 
   describe('load parent directories', () => {
@@ -37,6 +48,19 @@ describe('r2load', () => {
         expect(app.services[`test/${model}`].objName).to.equal(model);
         expect(app.services[`test/${controller}`].objName).to.equal(controller);
         expect(app.services[`test/${service}`].objName).to.equal(service);
+        return file;
+      });
+    });
+
+    it('should load parent directory without baseDir param', () => {
+      const app = {};
+      const loader = r2load();
+      loader
+        .load('test/model')
+        .into(app);
+      ['a', 'b', 'c'].map((file) => {
+        const model = `model/${file}`;
+        expect(app.services[`test/${model}`].objName).to.equal(model);
         return file;
       });
     });

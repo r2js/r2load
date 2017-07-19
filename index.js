@@ -3,17 +3,18 @@ const _ = require('underscore');
 const log = require('debug')('r2:load');
 
 module.exports = (options = {}) => {
-  const toString = Object.prototype.toString;
   const { baseDir } = options;
-  const scripts = [];
+  const toString = Object.prototype.toString;
+  const scriptList = [];
   const pattern = source => source.includes('.js') ? source : `${source}/**/*.js`;
-  const getList = cwd => list => list.map(name => ({ cwd, name }));
-  const app = getList(process.cwd());
-  const base = getList(baseDir);
-  const push = list => scripts.push(list);
-  const getApp = _.compose(push, app, glob.sync, pattern);
-  const getBase = _.compose(push, base, _.partial(glob.sync, _, { cwd: baseDir }), pattern);
-  const getObj = (name, instance) => ({ [name.replace('.js', '')]: instance });
+  const pushScript = list => scriptList.push(list);
+  const getFileList = cwd => list => list.map(name => ({ cwd, name }));
+  const appFileList = getFileList(process.cwd());
+  const baseFileList = getFileList(baseDir);
+  const globSyncBase = _.partial(glob.sync, _, { cwd: baseDir });
+  const getApp = _.compose(pushScript, appFileList, glob.sync, pattern);
+  const getBase = _.compose(pushScript, baseFileList, globSyncBase, pattern);
+  const getInstanceObj = (name, instance) => ({ [name.replace('.js', '')]: instance });
 
   return {
     load(source) {
@@ -22,13 +23,19 @@ module.exports = (options = {}) => {
     },
 
     local(source) {
-      getBase(source);
+      if (!baseDir) {
+        log('baseDir param not found!');
+      } else {
+        getBase(source);
+      }
+
       return this;
     },
 
     serve(...args) {
       const [object, ...rest] = args;
       let [name, opts] = rest;
+
       if (name && !opts && _.isObject(name)) {
         opts = name;
         name = name.name || object.name;
@@ -37,7 +44,7 @@ module.exports = (options = {}) => {
       }
 
       if (object && name) {
-        push({ object, name, opts });
+        pushScript({ object, name, opts });
       } else {
         log('service not found!');
       }
@@ -48,10 +55,12 @@ module.exports = (options = {}) => {
     into(...args) {
       const [obj = {}] = args;
       obj.services = {};
-      const list = _.uniq(_.flatten(scripts), 'name');
-      obj.services = list.reduce((memo, item) => {
+      const list = _.uniq(_.flatten(scriptList), 'name');
+
+      list.reduce((memo, item) => {
         const { object, name, opts } = item;
         let instance;
+
         if (object && typeof object === 'object') {
           instance = object; // load directly
         } else if (object && typeof object === 'function') {
@@ -64,7 +73,7 @@ module.exports = (options = {}) => {
           }
         }
         log(`loaded, ${item.name}`);
-        return Object.assign(memo, getObj(name, instance));
+        return Object.assign(memo, getInstanceObj(name, instance));
       }, obj.services);
 
       return this;
