@@ -32,7 +32,7 @@ module.exports = (options = {}) => {
       return this;
     },
 
-    serve(...args) {
+    resolveService(...args) {
       const [object, ...rest] = args;
       let [name, opts] = rest;
 
@@ -42,6 +42,12 @@ module.exports = (options = {}) => {
       } else if (!name && !opts && object) {
         name = object.name;
       }
+
+      return { object, name, opts };
+    },
+
+    serve(...args) {
+      const { object, name, opts } = this.resolveService(...args);
 
       if (object && name) {
         pushScript({ object, name, opts });
